@@ -6,12 +6,12 @@ import { VPSConnection } from "@/types/vps";
 import { useWebSocketManager } from "@/hooks/useWebSocketManager";
 import AddVPSModal from "@/components/AddVPSModal";
 import VPSCard from "@/components/VPSCard";
-import ImportExportPanel from "@/components/ImportExportPanel";
+import ImportExportModal from "@/components/ImportExportModal";
 
 export default function Home() {
   const [connections, setConnections] = useState<VPSConnection[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showExportImport, setShowExportImport] = useState(false);
+  const [isImportExportModalOpen, setIsImportExportModalOpen] = useState(false);
   const wsConnections = useWebSocketManager(connections);
 
   // Load connections from localStorage on mount
@@ -95,7 +95,7 @@ export default function Home() {
         </header>
         <div className="flex flex-col md:flex-row gap-2 md:gap-4 w-full md:w-auto">
           <motion.button
-            onClick={() => setShowExportImport(!showExportImport)}
+            onClick={() => setIsImportExportModalOpen(true)}
             className="bg-white text-black font-black uppercase px-4 md:px-6 py-3 md:py-4 border-4 border-black hover:bg-black hover:text-white transition-colors w-full md:w-auto"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
@@ -116,19 +116,6 @@ export default function Home() {
           </motion.button>
         </div>
       </motion.div>
-
-      <AnimatePresence>
-        {showExportImport && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2, ease: "linear" }}
-          >
-            <ImportExportPanel onImport={importConnections} onExport={exportConnections} />
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <div className="p-4 md:p-8">
         <motion.div 
@@ -183,6 +170,13 @@ export default function Home() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onAdd={addConnection}
+      />
+
+      <ImportExportModal
+        isOpen={isImportExportModalOpen}
+        onClose={() => setIsImportExportModalOpen(false)}
+        onImport={importConnections}
+        onExport={exportConnections}
       />
     </main>
   );
