@@ -32,7 +32,7 @@ export default function AddVPSModal({ isOpen, onClose, onAdd }: AddVPSModalProps
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-4">
       {/* Overlay */}
       <div 
         className="absolute inset-0 bg-black opacity-75"
@@ -40,20 +40,20 @@ export default function AddVPSModal({ isOpen, onClose, onAdd }: AddVPSModalProps
       />
       
       {/* Modal */}
-      <div className="relative bg-white border-4 border-black w-full max-w-md mx-4">
-        <div className="border-b-4 border-black p-6 flex items-center justify-between">
-          <h2 className="text-2xl font-black uppercase tracking-tight">
+      <div className="relative bg-white border-4 border-black w-full h-full md:h-auto md:max-w-md md:mx-4 flex flex-col">
+        <div className="border-b-4 border-black p-4 md:p-6 flex items-center justify-between">
+          <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight">
             ADD VPS CONNECTION
           </h2>
           <button
             onClick={handleClose}
-            className="text-3xl font-black hover:bg-black hover:text-white px-2 transition-colors"
+            className="text-2xl md:text-3xl font-black hover:bg-black hover:text-white px-2 transition-colors"
           >
             ×
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4 md:space-y-6 flex-1 md:flex-initial overflow-y-auto">
           <div>
             <label
               htmlFor="name"
@@ -67,7 +67,7 @@ export default function AddVPSModal({ isOpen, onClose, onAdd }: AddVPSModalProps
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="SERVER_001"
-              className="w-full px-4 py-3 border-2 border-black font-mono text-sm focus:outline-none focus:border-4"
+              className="w-full px-3 md:px-4 py-3 border-2 border-black font-mono text-sm focus:outline-none focus:border-4"
               required
               autoFocus
             />
@@ -86,7 +86,7 @@ export default function AddVPSModal({ isOpen, onClose, onAdd }: AddVPSModalProps
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="ws://127.0.0.1:8080/ws"
-              className="w-full px-4 py-3 border-2 border-black font-mono text-sm focus:outline-none focus:border-4"
+              className="w-full px-3 md:px-4 py-3 border-2 border-black font-mono text-sm focus:outline-none focus:border-4"
               required
             />
             <p className="mt-2 text-xs font-mono uppercase">
@@ -94,17 +94,17 @@ export default function AddVPSModal({ isOpen, onClose, onAdd }: AddVPSModalProps
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3 md:gap-4 pt-4 md:pt-0">
             <button
               type="submit"
-              className="bg-black text-white font-bold uppercase py-3 px-6 border-2 border-black hover:bg-white hover:text-black transition-colors"
+              className="bg-black text-white font-bold uppercase py-3 px-4 md:px-6 border-2 border-black hover:bg-white hover:text-black transition-colors text-sm md:text-base"
             >
-              ADD CONNECTION
+              ADD
             </button>
             <button
               type="button"
               onClick={handleClose}
-              className="bg-white text-black font-bold uppercase py-3 px-6 border-2 border-black hover:bg-black hover:text-white transition-colors"
+              className="bg-white text-black font-bold uppercase py-3 px-4 md:px-6 border-2 border-black hover:bg-black hover:text-white transition-colors text-sm md:text-base"
             >
               CANCEL
             </button>
