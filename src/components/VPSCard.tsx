@@ -3,6 +3,7 @@
 import { VPSConnection, WebSocketConnection } from "@/types/vps";
 import { formatBytes, formatUptime } from "@/utils/format";
 import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 
 interface VPSCardProps {
   connection: VPSConnection;
@@ -15,6 +16,7 @@ export default function VPSCard({
   wsConnection,
   onRemove,
 }: VPSCardProps) {
+  const [isExpanded, setIsExpanded] = useState(true);
   const getStatusColor = () => {
     switch (wsConnection?.status) {
       case "connected":
@@ -58,14 +60,24 @@ export default function VPSCard({
             {connection.url}
           </p>
         </div>
-        <motion.button
-          onClick={onRemove}
-          className="text-xl md:text-2xl font-black hover:bg-black hover:text-white px-2 transition-colors ml-2"
-          whileTap={{ scale: 0.8 }}
-          transition={{ duration: 0.1, ease: "linear" }}
-        >
-          ×
-        </motion.button>
+        <div className="flex items-center ml-2">
+          <motion.button
+            onClick={() => setIsExpanded((e) => !e)}
+            className="text-xl md:text-2xl font-black hover:bg-black hover:text-white px-2 transition-colors"
+            whileTap={{ scale: 0.8 }}
+            transition={{ duration: 0.1, ease: "linear" }}
+          >
+            {isExpanded ? "−" : "+"}
+          </motion.button>
+          <motion.button
+            onClick={onRemove}
+            className="text-xl md:text-2xl font-black hover:bg-black hover:text-white px-2 transition-colors"
+            whileTap={{ scale: 0.8 }}
+            transition={{ duration: 0.1, ease: "linear" }}
+          >
+            ×
+          </motion.button>
+        </div>
       </div>
 
       <div className="border-b-2 border-black p-3 md:p-4 flex items-center gap-2 md:gap-3">
@@ -90,15 +102,16 @@ export default function VPSCard({
         )}
       </div>
 
-      <AnimatePresence mode="wait">
-        {data ? (
-          <motion.div
-            key="data"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2, ease: "linear" }}
-          >
+      <AnimatePresence mode="wait" initial={false}>
+        {isExpanded && (
+          data ? (
+            <motion.div
+              key="data"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2, ease: "linear" }}
+            >
             <div className="grid grid-cols-2 border-b-2 border-black">
               <div className="p-3 md:p-4 border-r-2 border-black">
                 <p className="text-xs font-bold uppercase">UPTIME</p>
@@ -239,19 +252,20 @@ export default function VPSCard({
             </div>
           </motion.div>
         ) : (
-          <motion.div 
+          <motion.div
             key="no-data"
             className="p-8 md:p-12 text-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2, ease: "linear" }}
           >
             <p className="font-mono uppercase text-xs md:text-sm">
               {wsConnection?.status === "connecting" ? "CONNECTING..." : "NO DATA"}
             </p>
           </motion.div>
-        )}
+        )
+      )}
       </AnimatePresence>
     </motion.div>
   );
