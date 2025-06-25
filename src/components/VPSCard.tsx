@@ -23,159 +23,188 @@ export default function VPSCard({
       case "error":
         return "bg-red-500";
       default:
-        return "bg-gray-500";
+        return "bg-gray-300";
     }
   };
 
   const getStatusText = () => {
     switch (wsConnection?.status) {
       case "connected":
-        return "Connected";
+        return "ONLINE";
       case "connecting":
-        return "Connecting...";
+        return "CONNECTING";
       case "error":
-        return "Error";
+        return "ERROR";
       default:
-        return "Disconnected";
+        return "OFFLINE";
     }
   };
 
   const data = wsConnection?.data;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-      <div className="p-6">
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {connection.name}
-            </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
-              {connection.url}
-            </p>
-          </div>
-          <button
-            onClick={onRemove}
-            className="text-gray-400 hover:text-red-500 transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+    <div className="bg-white border-4 border-black">
+      <div className="border-b-4 border-black p-4 flex items-center justify-between">
+        <div className="flex-1">
+          <h3 className="text-xl font-black uppercase">
+            {connection.name}
+          </h3>
+          <p className="text-xs font-mono truncate">
+            {connection.url}
+          </p>
         </div>
+        <button
+          onClick={onRemove}
+          className="text-2xl font-black hover:bg-black hover:text-white px-2 transition-colors"
+        >
+          ×
+        </button>
+      </div>
 
-        <div className="flex items-center gap-2 mb-4">
-          <div className={`w-2 h-2 rounded-full ${getStatusColor()}`} />
-          <span className="text-sm text-gray-600 dark:text-gray-400">
-            {getStatusText()}
+      <div className="border-b-2 border-black p-4 flex items-center gap-3">
+        <div className={`w-4 h-4 ${getStatusColor()}`} />
+        <span className="font-bold uppercase text-sm">
+          {getStatusText()}
+        </span>
+        {wsConnection?.lastUpdate && (
+          <span className="text-xs font-mono ml-auto">
+            {new Date(wsConnection.lastUpdate).toLocaleTimeString()}
           </span>
-          {wsConnection?.lastUpdate && (
-            <span className="text-xs text-gray-500 dark:text-gray-500">
-              • Updated {new Date(wsConnection.lastUpdate).toLocaleTimeString()}
-            </span>
-          )}
-        </div>
-
-        {data ? (
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Uptime</p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {formatUptime(data.uptime_days)}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Load</p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {data.load.map(l => l.toFixed(2)).join(" ")}
-                </p>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between text-xs mb-1">
-                <span className="text-gray-500 dark:text-gray-400">CPU</span>
-                <span className="text-gray-900 dark:text-white">{data.cpu.toFixed(1)}%</span>
-              </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                <div
-                  className="bg-blue-500 h-2 rounded-full transition-all"
-                  style={{ width: `${Math.min(data.cpu, 100)}%` }}
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between text-xs mb-1">
-                <span className="text-gray-500 dark:text-gray-400">Memory</span>
-                <span className="text-gray-900 dark:text-white">
-                  {data.mem_used} / {data.mem_total}
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                <div
-                  className="bg-green-500 h-2 rounded-full transition-all"
-                  style={{
-                    width: `${
-                      (parseFloat(data.mem_used) / parseFloat(data.mem_total)) * 100
-                    }%`,
-                  }}
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between text-xs mb-1">
-                <span className="text-gray-500 dark:text-gray-400">Disk</span>
-                <span className="text-gray-900 dark:text-white">
-                  {data.disk_used_gib.toFixed(1)} GiB / {data.disk_total_gib.toFixed(1)} GiB
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                <div
-                  className="bg-purple-500 h-2 rounded-full transition-all"
-                  style={{
-                    width: `${(data.disk_used_gib / data.disk_total_gib) * 100}%`,
-                  }}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 pt-2">
-              <div className="text-xs">
-                <p className="text-gray-500 dark:text-gray-400">Network</p>
-                <p className="text-gray-900 dark:text-white">
-                  ↓ {formatBytes(data.rx_rate)}/s
-                </p>
-                <p className="text-gray-900 dark:text-white">
-                  ↑ {formatBytes(data.tx_rate)}/s
-                </p>
-              </div>
-              <div className="text-xs">
-                <p className="text-gray-500 dark:text-gray-400">Connections</p>
-                <p className="text-gray-900 dark:text-white">
-                  TCP: {data.tcp} | UDP: {data.udp}
-                </p>
-                <p className="text-gray-900 dark:text-white">
-                  Proc: {data.processes} | Thr: {data.threads}
-                </p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="py-8 text-center">
-            <p className="text-gray-500 dark:text-gray-400 text-sm">
-              {wsConnection?.status === "connecting" ? "Connecting..." : "No data available"}
-            </p>
-          </div>
         )}
       </div>
+
+      {data ? (
+        <div>
+          <div className="grid grid-cols-2 border-b-2 border-black">
+            <div className="p-4 border-r-2 border-black">
+              <p className="text-xs font-bold uppercase">UPTIME</p>
+              <p className="text-lg font-mono font-bold">
+                {formatUptime(data.uptime_days)}
+              </p>
+            </div>
+            <div className="p-4">
+              <p className="text-xs font-bold uppercase">LOAD</p>
+              <p className="text-lg font-mono font-bold">
+                {data.load.map(l => l.toFixed(2)).join(" ")}
+              </p>
+            </div>
+          </div>
+
+          <div className="p-4 border-b-2 border-black">
+            <div className="flex justify-between mb-1">
+              <span className="text-xs font-bold uppercase">CPU</span>
+              <span className="text-xs font-mono font-bold">{data.cpu.toFixed(1)}%</span>
+            </div>
+            <div className="w-full bg-gray-300 h-4 border-2 border-black">
+              <div
+                className="bg-black h-full transition-all"
+                style={{ width: `${Math.min(data.cpu, 100)}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="p-4 border-b-2 border-black">
+            <div className="flex justify-between mb-1">
+              <span className="text-xs font-bold uppercase">MEMORY</span>
+              <span className="text-xs font-mono font-bold">
+                {data.mem_used} / {data.mem_total}
+              </span>
+            </div>
+            <div className="w-full bg-gray-300 h-4 border-2 border-black">
+              <div
+                className="bg-black h-full transition-all"
+                style={{
+                  width: `${
+                    (parseFloat(data.mem_used) / parseFloat(data.mem_total)) * 100
+                  }%`,
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="p-4 border-b-2 border-black">
+            <div className="flex justify-between mb-1">
+              <span className="text-xs font-bold uppercase">SWAP</span>
+              <span className="text-xs font-mono font-bold">
+                {(data.swap_used_mib / 1024).toFixed(1)}G / {(data.swap_total_mib / 1024).toFixed(1)}G
+              </span>
+            </div>
+            <div className="w-full bg-gray-300 h-4 border-2 border-black">
+              <div
+                className="bg-black h-full transition-all"
+                style={{
+                  width: `${(data.swap_used_mib / data.swap_total_mib) * 100}%`,
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="p-4 border-b-2 border-black">
+            <div className="flex justify-between mb-1">
+              <span className="text-xs font-bold uppercase">DISK</span>
+              <span className="text-xs font-mono font-bold">
+                {data.disk_used_gib.toFixed(1)}G / {data.disk_total_gib.toFixed(1)}G
+              </span>
+            </div>
+            <div className="w-full bg-gray-300 h-4 border-2 border-black">
+              <div
+                className="bg-black h-full transition-all"
+                style={{
+                  width: `${(data.disk_used_gib / data.disk_total_gib) * 100}%`,
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 border-b-2 border-black">
+            <div className="p-4 border-r-2 border-black">
+              <p className="text-xs font-bold uppercase mb-2">NETWORK RATE</p>
+              <p className="text-xs font-mono">
+                ↓ {formatBytes(data.rx_rate)}/S
+              </p>
+              <p className="text-xs font-mono">
+                ↑ {formatBytes(data.tx_rate)}/S
+              </p>
+            </div>
+            <div className="p-4">
+              <p className="text-xs font-bold uppercase mb-2">NETWORK TOTAL</p>
+              <p className="text-xs font-mono">
+                ↓ {data.rx_total_gib.toFixed(2)}G
+              </p>
+              <p className="text-xs font-mono">
+                ↑ {data.tx_total_gib.toFixed(2)}G
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2">
+            <div className="p-4 border-r-2 border-black">
+              <p className="text-xs font-bold uppercase mb-2">CONNECTIONS</p>
+              <p className="text-xs font-mono">
+                TCP: {data.tcp}
+              </p>
+              <p className="text-xs font-mono">
+                UDP: {data.udp}
+              </p>
+            </div>
+            <div className="p-4">
+              <p className="text-xs font-bold uppercase mb-2">SYSTEM</p>
+              <p className="text-xs font-mono">
+                PROC: {data.processes}
+              </p>
+              <p className="text-xs font-mono">
+                THR: {data.threads}
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="p-12 text-center">
+          <p className="font-mono uppercase text-sm">
+            {wsConnection?.status === "connecting" ? "CONNECTING..." : "NO DATA"}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
