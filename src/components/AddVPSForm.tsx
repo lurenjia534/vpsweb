@@ -23,47 +23,35 @@ export default function AddVPSForm({ onAdd }: AddVPSFormProps) {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+    <div className="bg-white border-4 border-black p-0">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between text-left"
+        className="w-full flex items-center justify-between text-left p-6 border-b-4 border-black hover:bg-gray-100 transition-colors"
       >
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Add VPS Connection
+        <h2 className="text-2xl font-black uppercase tracking-tight">
+          ADD VPS CONNECTION
         </h2>
-        <svg
-          className={`w-5 h-5 text-gray-500 transform transition-transform ${
-            isExpanded ? "rotate-180" : ""
-          }`}
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
+        <span className="text-3xl font-black">
+          {isExpanded ? "−" : "+"}
+        </span>
       </button>
 
       {isExpanded && (
-        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div>
             <label
               htmlFor="name"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              className="block text-sm font-bold uppercase tracking-wide mb-2"
             >
-              VPS Name
+              VPS NAME
             </label>
             <input
               type="text"
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="My VPS Server"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+              placeholder="SERVER_001"
+              className="w-full px-4 py-3 border-2 border-black font-mono text-sm focus:outline-none focus:border-4"
               required
             />
           </div>
@@ -71,9 +59,9 @@ export default function AddVPSForm({ onAdd }: AddVPSFormProps) {
           <div>
             <label
               htmlFor="url"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              className="block text-sm font-bold uppercase tracking-wide mb-2"
             >
-              WebSocket URL
+              WEBSOCKET URL
             </label>
             <input
               type="text"
@@ -81,20 +69,20 @@ export default function AddVPSForm({ onAdd }: AddVPSFormProps) {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="ws://127.0.0.1:8080/ws"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+              className="w-full px-4 py-3 border-2 border-black font-mono text-sm focus:outline-none focus:border-4"
               required
             />
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Enter the WebSocket URL of your VPS probe
+            <p className="mt-2 text-xs font-mono uppercase">
+              ENTER THE WEBSOCKET URL OF YOUR VPS PROBE
             </p>
           </div>
 
-          <div className="flex gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <button
               type="submit"
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="bg-black text-white font-bold uppercase py-3 px-6 border-2 border-black hover:bg-white hover:text-black transition-colors"
             >
-              Add Connection
+              ADD CONNECTION
             </button>
             <button
               type="button"
@@ -103,9 +91,9 @@ export default function AddVPSForm({ onAdd }: AddVPSFormProps) {
                 setName("");
                 setUrl("");
               }}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              className="bg-white text-black font-bold uppercase py-3 px-6 border-2 border-black hover:bg-black hover:text-white transition-colors"
             >
-              Cancel
+              CANCEL
             </button>
           </div>
         </form>
