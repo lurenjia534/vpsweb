@@ -10,6 +10,7 @@ import VPSCard from "@/components/VPSCard";
 export default function Home() {
   const [connections, setConnections] = useState<VPSConnection[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showExportImport, setShowExportImport] = useState(false);
   const wsConnections = useWebSocketManager(connections);
 
   // Load connections from localStorage on mount
@@ -38,6 +39,37 @@ export default function Home() {
     setConnections(connections.filter((conn) => conn.id !== id));
   };
 
+  const exportConnections = () => {
+    const data = JSON.stringify(connections, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'vps-connections.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const importConnections = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const imported = JSON.parse(e.target?.result as string);
+          if (Array.isArray(imported)) {
+            setConnections(imported);
+          }
+        } catch (error) {
+          console.error('Invalid file format', error);
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-white p-0">
       <motion.div 
@@ -64,17 +96,69 @@ export default function Home() {
             REAL-TIME MONITORING SYSTEM
           </motion.p>
         </header>
-        <motion.button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-black text-white font-black uppercase px-4 md:px-8 py-3 md:py-4 border-4 border-black hover:bg-white hover:text-black transition-colors w-full md:w-auto"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.2, delay: 0.3, ease: "linear" }}
-          whileTap={{ scale: 0.95 }}
-        >
-          + ADD VPS
-        </motion.button>
+        <div className="flex flex-col md:flex-row gap-2 md:gap-4 w-full md:w-auto">
+          <motion.button
+            onClick={() => setShowExportImport(!showExportImport)}
+            className="bg-white text-black font-black uppercase px-4 md:px-6 py-3 md:py-4 border-4 border-black hover:bg-black hover:text-white transition-colors w-full md:w-auto"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.2, delay: 0.25, ease: "linear" }}
+            whileTap={{ scale: 0.95 }}
+          >
+            ⚙
+          </motion.button>
+          <motion.button
+            onClick={() => setIsModalOpen(true)}
+            className="bg-black text-white font-black uppercase px-4 md:px-8 py-3 md:py-4 border-4 border-black hover:bg-white hover:text-black transition-colors w-full md:w-auto"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.2, delay: 0.3, ease: "linear" }}
+            whileTap={{ scale: 0.95 }}
+          >
+            + ADD VPS
+          </motion.button>
+        </div>
       </motion.div>
+
+      <AnimatePresence>
+        {showExportImport && (
+          <motion.div
+            className="border-b-4 border-black p-4 md:p-6 bg-gray-100"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: "linear" }}
+          >
+            <div className="flex flex-col md:flex-row gap-4 items-start">
+              <div className="flex-1">
+                <p className="text-xs font-mono uppercase mb-2">
+                  NOTE: CONNECTIONS ARE STORED LOCALLY IN YOUR BROWSER
+                </p>
+                <p className="text-xs font-mono">
+                  INCOGNITO/PRIVATE WINDOWS HAVE SEPARATE STORAGE
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={exportConnections}
+                  className="bg-black text-white font-bold uppercase px-4 py-2 border-2 border-black hover:bg-white hover:text-black transition-colors text-xs"
+                >
+                  EXPORT
+                </button>
+                <label className="bg-white text-black font-bold uppercase px-4 py-2 border-2 border-black hover:bg-black hover:text-white transition-colors text-xs cursor-pointer">
+                  IMPORT
+                  <input
+                    type="file"
+                    accept=".json"
+                    onChange={importConnections}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="p-4 md:p-8">
         <motion.div 
