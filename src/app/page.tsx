@@ -6,6 +6,7 @@ import { VPSConnection } from "@/types/vps";
 import { useWebSocketManager } from "@/hooks/useWebSocketManager";
 import AddVPSModal from "@/components/AddVPSModal";
 import VPSCard from "@/components/VPSCard";
+import ImportExportPanel from "@/components/ImportExportPanel";
 
 export default function Home() {
   const [connections, setConnections] = useState<VPSConnection[]>([]);
@@ -52,22 +53,18 @@ export default function Home() {
     URL.revokeObjectURL(url);
   };
 
-  const importConnections = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const imported = JSON.parse(e.target?.result as string);
-          if (Array.isArray(imported)) {
-            setConnections(imported);
-          }
-        } catch (error) {
-          console.error('Invalid file format', error);
-        }
-      };
-      reader.readAsText(file);
+  const importConnections = async (file: File): Promise<boolean> => {
+    try {
+      const text = await file.text();
+      const imported = JSON.parse(text);
+      if (Array.isArray(imported)) {
+        setConnections(imported);
+        return true;
+      }
+    } catch (error) {
+      console.error("Invalid file format", error);
     }
+    return false;
   };
 
   return (
@@ -123,39 +120,12 @@ export default function Home() {
       <AnimatePresence>
         {showExportImport && (
           <motion.div
-            className="border-b-4 border-black p-4 md:p-6 bg-gray-100"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2, ease: "linear" }}
           >
-            <div className="flex flex-col md:flex-row gap-4 items-start">
-              <div className="flex-1">
-                <p className="text-xs font-mono uppercase mb-2">
-                  NOTE: CONNECTIONS ARE STORED LOCALLY IN YOUR BROWSER
-                </p>
-                <p className="text-xs font-mono">
-                  INCOGNITO/PRIVATE WINDOWS HAVE SEPARATE STORAGE
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={exportConnections}
-                  className="bg-black text-white font-bold uppercase px-4 py-2 border-2 border-black hover:bg-white hover:text-black transition-colors text-xs"
-                >
-                  EXPORT
-                </button>
-                <label className="bg-white text-black font-bold uppercase px-4 py-2 border-2 border-black hover:bg-black hover:text-white transition-colors text-xs cursor-pointer">
-                  IMPORT
-                  <input
-                    type="file"
-                    accept=".json"
-                    onChange={importConnections}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-            </div>
+            <ImportExportPanel onImport={importConnections} onExport={exportConnections} />
           </motion.div>
         )}
       </AnimatePresence>
