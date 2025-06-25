@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import { VPSConnection } from "@/types/vps";
 import { useWebSocketManager } from "@/hooks/useWebSocketManager";
-import AddVPSForm from "@/components/AddVPSForm";
+import AddVPSModal from "@/components/AddVPSModal";
 import VPSCard from "@/components/VPSCard";
 
 export default function Home() {
   const [connections, setConnections] = useState<VPSConnection[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const wsConnections = useWebSocketManager(connections);
 
   // Load connections from localStorage on mount
@@ -37,20 +38,26 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        <header className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-            VPS Monitor
+    <main className="min-h-screen bg-white p-0">
+      <div className="border-b-4 border-black p-8 flex items-center justify-between">
+        <header>
+          <h1 className="text-6xl font-black uppercase tracking-tight">
+            VPS_MONITOR
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Real-time monitoring for your VPS instances
+          <p className="text-sm font-mono uppercase mt-2">
+            REAL-TIME MONITORING SYSTEM FOR YOUR VPS INSTANCES
           </p>
         </header>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-black text-white font-black uppercase px-8 py-4 border-4 border-black hover:bg-white hover:text-black transition-colors"
+        >
+          + ADD VPS
+        </button>
+      </div>
 
-        <AddVPSForm onAdd={addConnection} />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <div className="p-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {connections.map((connection) => (
             <VPSCard
               key={connection.id}
@@ -61,14 +68,23 @@ export default function Home() {
           ))}
           
           {connections.length === 0 && (
-            <div className="col-span-full text-center py-16">
-              <p className="text-gray-500 dark:text-gray-400 text-lg">
-                No VPS connections yet. Add one to get started!
+            <div className="col-span-full border-4 border-dashed border-black p-16 text-center">
+              <p className="font-mono uppercase text-lg">
+                NO VPS CONNECTIONS DETECTED
+              </p>
+              <p className="font-mono text-sm mt-2">
+                ADD CONNECTION TO BEGIN MONITORING
               </p>
             </div>
           )}
         </div>
       </div>
+
+      <AddVPSModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onAdd={addConnection}
+      />
     </main>
   );
 }
