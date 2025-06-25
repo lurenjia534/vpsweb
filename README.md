@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VPS_MONITOR
+
+A brutalist real-time VPS monitoring dashboard built with **Next.js 15** and **React 19**. Add WebSocket endpoints for your servers and view live CPU, memory, disk, and network statistics with smooth animations powered by `framer-motion`.
+
+## Features
+
+- Manage VPS connections in the browser (persisted via `localStorage`).
+- Real-time status updates over WebSocket.
+- Add and remove connections using an animated modal dialog.
+- Responsive layout optimized for desktop and mobile.
 
 ## Getting Started
 
-First, run the development server:
+Install dependencies and start the development server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open <http://localhost:3000> in your browser to view the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build and Start
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create an optimized production build:
 
-## Learn More
+```bash
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
+Then start the server:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project Structure
 
-## Deploy on Vercel
+- `src/app` – application pages and global layout.
+- `src/components` – React components (`VPSCard`, `AddVPSModal`).
+- `src/hooks` – custom hooks (`useWebSocketManager`).
+- `src/utils` – utility helpers.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Adding a VPS Connection
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Click the **+ ADD VPS** button on the homepage and enter a name and the WebSocket URL of your VPS probe (for example `ws://127.0.0.1:8080/ws`). Metrics are stored locally; no server-side configuration is required.
+
+---
+
+Crafted with ❤️ for quick VPS monitoring experiments.
