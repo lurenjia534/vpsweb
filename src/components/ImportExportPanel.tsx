@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import { FileDown, FileUp } from "lucide-react";
 
 interface ImportExportPanelProps {
   onImport: (file: File) => Promise<boolean>;
@@ -47,13 +47,13 @@ export default function ImportExportPanel({ onImport, onExport }: ImportExportPa
             title="Export connections"
             className="bg-black text-white font-bold uppercase px-4 py-2 border-2 border-black hover:bg-white hover:text-black transition-colors text-xs flex items-center"
           >
-            <Image src="/file.svg" alt="" width={16} height={16} className="mr-2" />
+            <FileDown className="mr-2" size={16} />
             EXPORT
           </button>
           <label
             className="bg-white text-black font-bold uppercase px-4 py-2 border-2 border-black hover:bg-black hover:text-white transition-colors text-xs cursor-pointer flex items-center"
           >
-            <Image src="/window.svg" alt="" width={16} height={16} className="mr-2" />
+            <FileUp className="mr-2" size={16} />
             IMPORT
             <input
               type="file"
