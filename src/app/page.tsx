@@ -4,15 +4,25 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { VPSConnection } from "@/types/vps";
 import { useWebSocketManager } from "@/hooks/useWebSocketManager";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 import AddVPSModal from "@/components/AddVPSModal";
 import VPSCard from "@/components/VPSCard";
 import ImportExportModal from "@/components/ImportExportModal";
 
 export default function Home() {
+  const { loggedIn, logout } = useAuth();
+  const router = useRouter();
   const [connections, setConnections] = useState<VPSConnection[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isImportExportModalOpen, setIsImportExportModalOpen] = useState(false);
   const wsConnections = useWebSocketManager(connections);
+
+  useEffect(() => {
+    if (!loggedIn) {
+      router.push("/login");
+    }
+  }, [loggedIn, router]);
 
   // Load connections from localStorage on mount
   useEffect(() => {
@@ -67,6 +77,11 @@ export default function Home() {
     return false;
   };
 
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
+  };
+
   return (
     <main className="min-h-screen bg-white p-0">
       <motion.div 
@@ -113,6 +128,16 @@ export default function Home() {
             whileTap={{ scale: 0.95 }}
           >
             + ADD VPS
+          </motion.button>
+          <motion.button
+            onClick={handleLogout}
+            className="bg-white text-black font-black uppercase px-4 md:px-6 py-3 md:py-4 border-4 border-black hover:bg-black hover:text-white transition-colors w-full md:w-auto"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.2, delay: 0.35, ease: "linear" }}
+            whileTap={{ scale: 0.95 }}
+          >
+            LOG OUT
           </motion.button>
         </div>
       </motion.div>
