@@ -11,7 +11,7 @@ import VPSCard from "@/components/VPSCard";
 import ImportExportModal from "@/components/ImportExportModal";
 
 export default function Home() {
-  const { loggedIn, logout } = useAuth();
+  const { loggedIn, logout, isLoading } = useAuth();
   const router = useRouter();
   const [connections, setConnections] = useState<VPSConnection[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,10 +19,10 @@ export default function Home() {
   const wsConnections = useWebSocketManager(connections);
 
   useEffect(() => {
-    if (!loggedIn) {
+    if (!isLoading && !loggedIn) {
       router.push("/login");
     }
-  }, [loggedIn, router]);
+  }, [loggedIn, router, isLoading]);
 
   // Load connections from localStorage on mount
   useEffect(() => {
@@ -81,6 +81,16 @@ export default function Home() {
     logout();
     router.push("/login");
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center">
+          <p className="font-mono uppercase">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-white p-0">

@@ -8,11 +8,13 @@ const STORAGE_KEY = "loggedIn";
 
 export function useAuth() {
   const [loggedIn, setLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const flag = localStorage.getItem(STORAGE_KEY);
       setLoggedIn(flag === "true");
+      setIsLoading(false);
     }
   }, []);
 
@@ -30,5 +32,5 @@ export function useAuth() {
     setLoggedIn(false);
   };
 
-  return { loggedIn, login, logout };
+  return { loggedIn, login, logout, isLoading };
 }

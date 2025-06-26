@@ -6,16 +6,16 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { loggedIn, login } = useAuth();
+  const { loggedIn, login, isLoading } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (loggedIn) {
+    if (!isLoading && loggedIn) {
       router.push("/");
     }
-  }, [loggedIn, router]);
+  }, [loggedIn, router, isLoading]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +25,16 @@ export default function LoginPage() {
       setError("Invalid credentials");
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-white">
+        <div className="text-center">
+          <p className="font-mono uppercase">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-white">
