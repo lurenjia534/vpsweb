@@ -7,11 +7,12 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { loggedIn, login, isLoading } = useAuth();
+  const { loggedIn, login, register, isLoading } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRegisterMode, setIsRegisterMode] = useState(false);
 
   useEffect(() => {
     if (!isLoading && loggedIn) {
@@ -24,13 +25,14 @@ export default function LoginPage() {
     setIsSubmitting(true);
     setError("");
     
-    // Add small delay for animation effect
-    await new Promise(resolve => setTimeout(resolve, 300));
+    const result = isRegisterMode 
+      ? await register(username, password)
+      : await login(username, password);
     
-    if (login(username, password)) {
+    if (result.success) {
       router.push("/");
     } else {
-      setError("INVALID_CREDENTIALS");
+      setError(result.error || "OPERATION_FAILED");
       setIsSubmitting(false);
     }
   };
@@ -76,7 +78,7 @@ export default function LoginPage() {
           VPS_MONITOR
         </h1>
         <p className="text-xs md:text-sm font-mono uppercase mt-2">
-          AUTHENTICATION_REQUIRED
+          CLOUD_SYNC_ENABLED
         </p>
       </motion.div>
 
@@ -103,7 +105,7 @@ export default function LoginPage() {
               transition={{ duration: 0.5, delay: 0.3 }}
             >
               <h2 className="text-3xl md:text-4xl font-black uppercase">
-                ACCESS
+                {isRegisterMode ? 'CREATE' : 'ACCESS'}
               </h2>
               <div className="h-2 bg-black w-20"></div>
             </motion.div>
@@ -136,6 +138,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
+                  minLength={isRegisterMode ? 6 : undefined}
                   className="border-4 border-black p-4 w-full font-mono placeholder:text-gray-500 focus:outline-none focus:bg-yellow-100 transition-colors"
                   disabled={isSubmitting}
                 />
@@ -178,21 +181,31 @@ export default function LoginPage() {
                   animate={{ opacity: [1, 0.5, 1] }}
                   transition={{ duration: 1, repeat: Infinity }}
                 >
-                  AUTHENTICATING...
+                  {isRegisterMode ? 'CREATING...' : 'AUTHENTICATING...'}
                 </motion.span>
               ) : (
-                'AUTHORIZE →'
+                isRegisterMode ? 'CREATE ACCOUNT →' : 'AUTHORIZE →'
               )}
             </motion.button>
 
             <motion.div 
-              className="text-center"
+              className="text-center space-y-2"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.6 }}
             >
-              <p className="text-xs font-mono uppercase text-gray-600">
-                SECURE_CONNECTION_ESTABLISHED
+              <button
+                type="button"
+                onClick={() => {
+                  setIsRegisterMode(!isRegisterMode);
+                  setError("");
+                }}
+                className="text-xs font-mono uppercase text-gray-600 hover:text-black transition-colors"
+              >
+                {isRegisterMode ? '← BACK TO LOGIN' : 'CREATE NEW ACCOUNT →'}
+              </button>
+              <p className="text-xs font-mono uppercase text-gray-400">
+                SECURE_CLOUD_STORAGE
               </p>
             </motion.div>
           </form>
