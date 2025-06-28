@@ -19,9 +19,12 @@ export interface VPSData {
 }
 
 export interface VPSConnection {
-  id: string;
+  id: number | string;
   name: string;
   url: string;
+  userId?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface WebSocketConnection {
