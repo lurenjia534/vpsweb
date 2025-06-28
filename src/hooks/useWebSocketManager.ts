@@ -13,62 +13,76 @@ export function useWebSocketManager(connections: VPSConnection[]) {
       wsRefs.current[connection.id] = ws;
 
       // Update connection status
+      const newConnection: WebSocketConnection = {
+        ws: null,
+        status: "connecting",
+        data: null,
+        lastUpdate: null,
+      };
+
       setWsConnections((prev) => ({
         ...prev,
-        [connection.id]: {
-          ws: null,
-          status: "connecting",
-          data: null,
-          lastUpdate: null,
-        },
+        [connection.id]: newConnection,
       }));
 
       ws.onopen = () => {
-        setWsConnections((prev) => ({
-          ...prev,
-          [connection.id]: {
+        setWsConnections((prev) => {
+          const updated: WebSocketConnection = {
             ...prev[connection.id],
             ws,
             status: "connected",
-          },
-        }));
+          };
+          return {
+            ...prev,
+            [connection.id]: updated,
+          };
+        });
       };
 
       ws.onmessage = (event) => {
         try {
           const data: VPSData = JSON.parse(event.data);
-          setWsConnections((prev) => ({
-            ...prev,
-            [connection.id]: {
+          setWsConnections((prev) => {
+            const updated: WebSocketConnection = {
               ...prev[connection.id],
               data,
               lastUpdate: new Date(),
-            },
-          }));
+            };
+            return {
+              ...prev,
+              [connection.id]: updated,
+            };
+          });
         } catch (error) {
           console.error("Failed to parse WebSocket data:", error);
         }
       };
 
       ws.onerror = () => {
-        setWsConnections((prev) => ({
-          ...prev,
-          [connection.id]: {
+        setWsConnections((prev) => {
+          const updated: WebSocketConnection = {
             ...prev[connection.id],
             status: "error",
-          },
-        }));
+          };
+          return {
+            ...prev,
+            [connection.id]: updated,
+          };
+        });
       };
 
       ws.onclose = () => {
-        setWsConnections((prev) => ({
-          ...prev,
-          [connection.id]: {
+        setWsConnections((prev) => {
+          const updated: WebSocketConnection = {
             ...prev[connection.id],
             ws: null,
             status: "disconnected",
-          },
-        }));
+          };
+          return {
+            ...prev,
+            [connection.id]: updated,
+          };
+        });
 
         // Attempt to reconnect after 5 seconds
         if (connections.find((conn) => conn.id === connection.id)) {
