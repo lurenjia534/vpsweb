@@ -100,10 +100,10 @@ export default function ImportExportModal({
                 className="bg-gray-100 border-2 border-black p-4 rounded"
               >
                 <p className="text-xs font-mono uppercase mb-2">
-                  ⚠ NOTE: CONNECTIONS ARE STORED LOCALLY IN YOUR BROWSER
+                  ⚠ NOTE: CONNECTIONS ARE STORED IN YOUR ACCOUNT
                 </p>
                 <p className="text-xs font-mono">
-                  INCOGNITO/PRIVATE WINDOWS HAVE SEPARATE STORAGE
+                  USE EXPORT TO BACK UP OR SHARE THEM
                 </p>
               </motion.div>
 
