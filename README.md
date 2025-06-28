@@ -33,6 +33,7 @@ Then start the server:
 ```bash
 npm start
 ```
+
 ## Architecture
 
 - **Frontend:** Next.js 15 and React 19 with Tailwind CSS and framer-motion.
@@ -40,7 +41,6 @@ npm start
 - **Database:** SQLite via better-sqlite3 and Drizzle ORM to store users and VPS connections.
 - **Auth:** Passwords hashed with bcrypt and authenticated via JWT tokens.
 - **Real-time:** Metrics streamed from your servers over WebSockets.
-
 
 ## Project Structure
 
