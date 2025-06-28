@@ -4,7 +4,7 @@ A brutalist real-time VPS monitoring dashboard built with **Next.js 15** and **R
 
 ## Features
 
-- Manage VPS connections in the browser (persisted via `localStorage`).
+- Manage VPS connections in the browser with server-side persistence.
 - Real-time status updates over WebSocket.
 - Add and remove connections using an animated modal dialog.
 - Responsive layout optimized for desktop and mobile.
@@ -43,7 +43,7 @@ npm start
 
 ## Adding a VPS Connection
 
-Click the **+ ADD VPS** button on the homepage and enter a name and the WebSocket URL of your VPS probe (for example `ws://127.0.0.1:8080/ws`). Metrics are stored locally; no server-side configuration is required.
+Click the **+ ADD VPS** button on the homepage and enter a name and the WebSocket URL of your VPS probe (for example `ws://127.0.0.1:8080/ws`). Connections are stored in the database and linked to your account.
 
 ---
 

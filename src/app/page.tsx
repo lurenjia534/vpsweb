@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { VPSConnection } from "@/types/vps";
 import { useWebSocketManager } from "@/hooks/useWebSocketManager";
 import { useAuth } from "@/hooks/useAuth";
+import { apiClient } from "@/lib/api-client";
 import { useRouter } from "next/navigation";
 import AddVPSModal from "@/components/AddVPSModal";
 import VPSCard from "@/components/VPSCard";
@@ -24,30 +25,32 @@ export default function Home() {
     }
   }, [loggedIn, router, isLoading]);
 
-  // Load connections from localStorage on mount
+  // Load connections from the API once authenticated
   useEffect(() => {
-    const savedConnections = localStorage.getItem("vpsConnections");
-    if (savedConnections) {
-      setConnections(JSON.parse(savedConnections));
+    if (!isLoading && loggedIn) {
+      apiClient.connections
+        .list()
+        .then((list) => setConnections(list))
+        .catch((err) => console.error("Failed to load connections", err));
     }
-  }, []);
+  }, [loggedIn, isLoading]);
 
-  // Save connections to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem("vpsConnections", JSON.stringify(connections));
-  }, [connections]);
-
-  const addConnection = (name: string, url: string) => {
-    const newConnection: VPSConnection = {
-      id: Date.now().toString(),
-      name,
-      url,
-    };
-    setConnections([...connections, newConnection]);
+  const addConnection = async (name: string, url: string) => {
+    try {
+      const newConnection = await apiClient.connections.create(name, url);
+      setConnections((prev) => [newConnection, ...prev]);
+    } catch (error) {
+      console.error("Failed to add connection", error);
+    }
   };
 
-  const removeConnection = (id: string) => {
-    setConnections(connections.filter((conn) => conn.id !== id));
+  const removeConnection = async (id: number | string) => {
+    try {
+      await apiClient.connections.delete(Number(id));
+      setConnections((prev) => prev.filter((conn) => conn.id !== id));
+    } catch (error) {
+      console.error("Failed to remove connection", error);
+    }
   };
 
   const exportConnections = () => {
@@ -68,7 +71,13 @@ export default function Home() {
       const text = await file.text();
       const imported = JSON.parse(text);
       if (Array.isArray(imported)) {
-        setConnections(imported);
+        await Promise.all(
+          imported.map((c: VPSConnection) =>
+            apiClient.connections.create(c.name, c.url)
+          )
+        );
+        const refreshed = await apiClient.connections.list();
+        setConnections(refreshed);
         return true;
       }
     } catch (error) {
