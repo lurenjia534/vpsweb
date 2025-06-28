@@ -1,4 +1,5 @@
 export interface VPSData {
+  os_name: string;
   uptime_days: number;
   load: [number, number, number];
   cpu: number;

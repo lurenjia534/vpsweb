@@ -114,8 +114,12 @@ export default function VPSCard({
             >
             <div className="grid grid-cols-2 border-b-2 border-black">
               <div className="p-3 md:p-4 border-r-2 border-black">
-                <p className="text-xs font-bold uppercase">UPTIME</p>
+                <p className="text-xs font-bold uppercase">SYSTEM</p>
                 <p className="text-sm md:text-lg font-mono font-bold">
+                  {data.os_name}
+                </p>
+                <p className="text-xs font-bold uppercase mt-2">UPTIME</p>
+                <p className="text-sm md:text-base font-mono font-bold">
                   {formatUptime(data.uptime_days)}
                 </p>
               </div>
