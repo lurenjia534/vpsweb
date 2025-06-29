@@ -9,7 +9,9 @@ import { apiClient } from "@/lib/api-client";
 import { useRouter } from "next/navigation";
 import AddVPSModal from "@/components/AddVPSModal";
 import VPSCard from "@/components/VPSCard";
+import VPSCardSkeleton from "@/components/VPSCardSkeleton";
 import ImportExportModal from "@/components/ImportExportModal";
+import { Settings, Plus, LogOut, Server, Loader2 } from "lucide-react";
 
 export default function Home() {
   const { loggedIn, logout, isLoading } = useAuth();
@@ -17,6 +19,7 @@ export default function Home() {
   const [connections, setConnections] = useState<VPSConnection[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isImportExportModalOpen, setIsImportExportModalOpen] = useState(false);
+  const [isLoadingConnections, setIsLoadingConnections] = useState(true);
   const wsConnections = useWebSocketManager(connections);
 
   useEffect(() => {
@@ -28,10 +31,17 @@ export default function Home() {
   // Load connections from the API once authenticated
   useEffect(() => {
     if (!isLoading && loggedIn) {
+      setIsLoadingConnections(true);
       apiClient.connections
         .list()
-        .then((list) => setConnections(list))
-        .catch((err) => console.error("Failed to load connections", err));
+        .then((list) => {
+          setConnections(list);
+          setIsLoadingConnections(false);
+        })
+        .catch((err) => {
+          console.error("Failed to load connections", err);
+          setIsLoadingConnections(false);
+        });
     }
   }, [loggedIn, isLoading]);
 
@@ -93,122 +103,223 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center">
-          <p className="font-mono uppercase">Loading...</p>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+        <div className="fixed inset-0 -z-10 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
+          <div className="absolute top-40 left-40 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
         </div>
+        
+        <div className="min-h-screen flex items-center justify-center">
+          <motion.div 
+            className="text-center"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="relative">
+              <div className="w-20 h-20 mx-auto flex items-center justify-center">
+                <Loader2 className="w-16 h-16 animate-spin text-purple-600" strokeWidth={3} />
+              </div>
+              <p className="mt-4 text-gray-600 font-medium">Loading your dashboard...</p>
+            </div>
+          </motion.div>
+        </div>
+        
+        <style jsx>{`
+          @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+          }
+          .animate-blob {
+            animation: blob 7s infinite;
+          }
+          .animation-delay-2000 {
+            animation-delay: 2s;
+          }
+          .animation-delay-4000 {
+            animation-delay: 4s;
+          }
+        `}</style>
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-white p-0">
+    <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+      {/* Background decoration */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
+        <div className="absolute top-40 left-40 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
+      </div>
+
       <motion.div 
-        className="border-b-4 border-black p-4 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.3, ease: "linear" }}
+        className="backdrop-blur-md bg-white/70 shadow-xl border-b border-white/20"
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <header>
-          <motion.h1 
-            className="text-3xl md:text-6xl font-black uppercase tracking-tight"
-            initial={{ x: -50, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.3, delay: 0.1, ease: "linear" }}
-          >
-            VPS_MONITOR
-          </motion.h1>
-          <motion.p 
-            className="text-xs md:text-sm font-mono uppercase mt-1 md:mt-2"
-            initial={{ x: -50, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.3, delay: 0.2, ease: "linear" }}
-          >
-            REAL-TIME MONITORING SYSTEM
-          </motion.p>
-        </header>
-        <div className="flex flex-col md:flex-row gap-2 md:gap-4 w-full md:w-auto">
-          <motion.button
-            onClick={() => setIsImportExportModalOpen(true)}
-            className="bg-white text-black font-black uppercase px-4 md:px-6 py-3 md:py-4 border-4 border-black hover:bg-black hover:text-white transition-colors w-full md:w-auto"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.2, delay: 0.25, ease: "linear" }}
-            whileTap={{ scale: 0.95 }}
-          >
-            ⚙
-          </motion.button>
-          <motion.button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-black text-white font-black uppercase px-4 md:px-8 py-3 md:py-4 border-4 border-black hover:bg-white hover:text-black transition-colors w-full md:w-auto"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.2, delay: 0.3, ease: "linear" }}
-            whileTap={{ scale: 0.95 }}
-          >
-            + ADD VPS
-          </motion.button>
-          <motion.button
-            onClick={handleLogout}
-            className="bg-white text-black font-black uppercase px-4 md:px-6 py-3 md:py-4 border-4 border-black hover:bg-black hover:text-white transition-colors w-full md:w-auto"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.2, delay: 0.35, ease: "linear" }}
-            whileTap={{ scale: 0.95 }}
-          >
-            LOG OUT
-          </motion.button>
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <header>
+              <motion.h1 
+                className="text-3xl md:text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent"
+                initial={{ x: -30, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
+              >
+                VPS Monitor
+              </motion.h1>
+              <motion.p 
+                className="text-sm text-gray-600 mt-2 font-medium"
+                initial={{ x: -30, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
+              >
+                Real-time infrastructure monitoring
+              </motion.p>
+            </header>
+            <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+              <motion.button
+                onClick={() => setIsImportExportModalOpen(true)}
+                className="px-5 py-2.5 bg-white/80 backdrop-blur border border-gray-200 rounded-xl text-gray-700 hover:bg-white hover:shadow-md transition-all flex items-center justify-center gap-2 font-medium"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.3, delay: 0.25, type: "spring", stiffness: 200 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Settings className="w-5 h-5" />
+                Settings
+              </motion.button>
+              <motion.button
+                onClick={() => setIsModalOpen(true)}
+                className="px-6 py-2.5 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all font-medium flex items-center gap-2"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.3, delay: 0.3, type: "spring", stiffness: 200 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Plus className="w-5 h-5" />
+                Add VPS
+              </motion.button>
+              <motion.button
+                onClick={handleLogout}
+                className="px-5 py-2.5 bg-white/80 backdrop-blur border border-gray-200 rounded-xl text-gray-700 hover:bg-white hover:shadow-md transition-all font-medium flex items-center gap-2"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.3, delay: 0.35, type: "spring", stiffness: 200 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <LogOut className="w-4 h-4" />
+                Log out
+              </motion.button>
+            </div>
+          </div>
         </div>
       </motion.div>
 
       <div className="p-4 md:p-8">
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8"
+          className="max-w-7xl mx-auto space-y-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.4, ease: "linear" }}
+          transition={{ duration: 0.5, delay: 0.4 }}
         >
           <AnimatePresence mode="popLayout">
-            {connections.map((connection, index) => (
-              <motion.div
-                key={connection.id}
-                layout
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ 
-                  duration: 0.2, 
-                  delay: index * 0.05,
-                  ease: "linear",
-                  layout: { duration: 0.2, ease: "linear" }
-                }}
-              >
-                <VPSCard
-                  connection={connection}
-                  wsConnection={wsConnections[connection.id]}
-                  onRemove={() => removeConnection(connection.id)}
-                />
-              </motion.div>
-            ))}
+            {isLoadingConnections ? (
+              // Show skeleton loaders while loading
+              [...Array(3)].map((_, index) => (
+                <motion.div
+                  key={`skeleton-${index}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                >
+                  <VPSCardSkeleton />
+                </motion.div>
+              ))
+            ) : (
+              connections.map((connection, index) => (
+                <motion.div
+                  key={connection.id}
+                  layout
+                  initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+                  transition={{ 
+                    duration: 0.4, 
+                    delay: index * 0.08,
+                    ease: "easeOut",
+                    layout: { duration: 0.3, type: "spring", stiffness: 300, damping: 30 }
+                  }}
+                >
+                  <VPSCard
+                    connection={connection}
+                    wsConnection={wsConnections[connection.id]}
+                    onRemove={() => removeConnection(connection.id)}
+                  />
+                </motion.div>
+              ))
+            )}
           </AnimatePresence>
           
-          {connections.length === 0 && (
+          {!isLoadingConnections && connections.length === 0 && (
             <motion.div 
-              className="col-span-full border-4 border-dashed border-black p-8 md:p-16 text-center"
+              className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg p-16 text-center"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3, ease: "linear" }}
+              transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
             >
-              <p className="font-mono uppercase text-sm md:text-lg">
-                NO VPS CONNECTIONS DETECTED
-              </p>
-              <p className="font-mono text-xs md:text-sm mt-2">
-                ADD CONNECTION TO BEGIN MONITORING
-              </p>
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.2, type: "spring", stiffness: 200 }}
+              >
+                <div className="w-20 h-20 mx-auto bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mb-6">
+                  <Server className="w-10 h-10 text-gray-400" strokeWidth={1.5} />
+                </div>
+              </motion.div>
+              <motion.p 
+                className="text-gray-900 text-xl font-semibold mb-2"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.3 }}
+              >
+                No servers connected
+              </motion.p>
+              <motion.p 
+                className="text-gray-500 text-sm"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.4 }}
+              >
+                Add your first VPS to begin monitoring your infrastructure
+              </motion.p>
             </motion.div>
           )}
         </motion.div>
       </div>
+
+      <style jsx>{`
+        @keyframes blob {
+          0% { transform: translate(0px, 0px) scale(1); }
+          33% { transform: translate(30px, -50px) scale(1.1); }
+          66% { transform: translate(-20px, 20px) scale(0.9); }
+          100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+      `}</style>
 
       <AddVPSModal
         isOpen={isModalOpen}
