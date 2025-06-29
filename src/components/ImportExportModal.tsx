@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileDown, FileUp } from "lucide-react";
+import { FileDown, FileUp, X, Loader2 } from "lucide-react";
 
 interface ImportExportModalProps {
   isOpen: boolean;
@@ -11,11 +11,11 @@ interface ImportExportModalProps {
   onExport: () => void;
 }
 
-export default function ImportExportModal({ 
-  isOpen, 
-  onClose, 
-  onImport, 
-  onExport 
+export default function ImportExportModal({
+  isOpen,
+  onClose,
+  onImport,
+  onExport
 }: ImportExportModalProps) {
   const [fileName, setFileName] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -28,13 +28,12 @@ export default function ImportExportModal({
     setIsImporting(true);
     setFileName(file.name);
     setError("");
-    
+
     const success = await onImport(file);
     if (!success) {
       setError("Failed to parse file. Please ensure it's a valid JSON file.");
     } else {
       setError("");
-      // Close modal after successful import
       setTimeout(() => {
         handleClose();
       }, 500);
@@ -44,7 +43,6 @@ export default function ImportExportModal({
 
   const handleExport = () => {
     onExport();
-    // Close modal after export
     setTimeout(() => {
       handleClose();
     }, 500);
@@ -59,88 +57,85 @@ export default function ImportExportModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Overlay */}
-          <motion.div 
-            className="absolute inset-0 bg-black"
+          <motion.div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.75 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: "linear" }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
             onClick={handleClose}
           />
-          
+
           {/* Modal */}
-          <motion.div 
-            className="relative bg-white border-4 border-black w-full h-full md:h-auto md:max-w-lg md:mx-4 flex flex-col"
-            initial={{ scale: 0, rotate: -5 }}
-            animate={{ scale: 1, rotate: 0 }}
-            exit={{ scale: 0, rotate: 5 }}
-            transition={{ duration: 0.2, ease: "linear" }}
+          <motion.div
+            className="relative w-full max-w-lg mx-auto bg-white/60 backdrop-blur-2xl rounded-2xl shadow-2xl overflow-hidden border border-white/20"
+            initial={{ opacity: 0, scale: 0.9, y: -20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
           >
-            <div className="border-b-4 border-black p-4 md:p-6 flex items-center justify-between">
-              <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight">
-                IMPORT/EXPORT CONNECTIONS
+            <div className="p-6 flex items-center justify-between border-b border-white/20">
+              <h2 className="text-lg font-bold text-gray-900 tracking-tight">
+                Import / Export Connections
               </h2>
               <motion.button
                 onClick={handleClose}
-                className="text-2xl md:text-3xl font-black hover:bg-black hover:text-white px-2 transition-colors"
-                whileTap={{ scale: 0.8 }}
-                transition={{ duration: 0.1, ease: "linear" }}
+                className="w-8 h-8 rounded-full bg-white/30 hover:bg-white/50 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-colors"
+                whileTap={{ scale: 0.9 }}
               >
-                ×
+                <X size={20} />
               </motion.button>
             </div>
 
-            <div className="p-4 md:p-6 space-y-4 md:space-y-6 flex-1 md:flex-initial overflow-y-auto">
+            <div className="p-6 space-y-6">
               <motion.div
-                initial={{ y: 20, opacity: 0 }}
+                initial={{ y: 10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.2, delay: 0.1, ease: "linear" }}
-                className="bg-gray-100 border-2 border-black p-4 rounded"
+                transition={{ duration: 0.3, delay: 0.1, ease: "easeInOut" }}
+                className="bg-white/30 border border-white/20 p-4 rounded-lg"
               >
-                <p className="text-xs font-mono uppercase mb-2">
-                  ⚠ NOTE: CONNECTIONS ARE STORED IN YOUR ACCOUNT
-                </p>
-                <p className="text-xs font-mono">
-                  USE EXPORT TO BACK UP OR SHARE THEM
+                <p className="text-xs font-medium text-gray-700">
+                  Note: Connections are stored in your account. Use export to back up or share them.
                 </p>
               </motion.div>
 
               <motion.div
-                initial={{ y: 20, opacity: 0 }}
+                initial={{ y: 10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.2, delay: 0.2, ease: "linear" }}
+                transition={{ duration: 0.3, delay: 0.2, ease: "easeInOut" }}
                 className="space-y-4"
               >
-                <div>
-                  <h3 className="text-sm font-bold uppercase tracking-wide mb-3">
-                    EXPORT CONNECTIONS
+                {/* Export */}
+                <div className="p-4 bg-white/30 rounded-lg border border-white/20">
+                  <h3 className="text-sm font-bold text-gray-800 mb-1">
+                    Export Connections
                   </h3>
-                  <p className="text-xs font-mono mb-3">
-                    Save your current VPS connections to a JSON file
+                  <p className="text-xs text-gray-600 mb-3">
+                    Save your current VPS connections to a JSON file.
                   </p>
                   <motion.button
                     onClick={handleExport}
-                    className="bg-black text-white font-bold uppercase px-6 py-3 border-2 border-black hover:bg-white hover:text-black transition-colors text-sm flex items-center justify-center w-full"
-                    whileTap={{ scale: 0.95 }}
-                    transition={{ duration: 0.1, ease: "linear" }}
+                    className="w-full bg-gray-800 text-white font-semibold px-4 py-2.5 rounded-lg border border-transparent hover:bg-gray-900 hover:shadow-lg transition-all text-sm flex items-center justify-center"
+                    whileTap={{ scale: 0.98 }}
                   >
                     <FileDown className="mr-2" size={16} />
-                    EXPORT TO FILE
+                    Export to File
                   </motion.button>
                 </div>
 
-                <div className="border-t-2 border-black pt-4">
-                  <h3 className="text-sm font-bold uppercase tracking-wide mb-3">
-                    IMPORT CONNECTIONS
+                {/* Import */}
+                <div className="p-4 bg-white/30 rounded-lg border border-white/20">
+                  <h3 className="text-sm font-bold text-gray-800 mb-1">
+                    Import Connections
                   </h3>
-                  <p className="text-xs font-mono mb-3">
-                    Load VPS connections from a previously exported JSON file
+                  <p className="text-xs text-gray-600 mb-3">
+                    Load connections from a previously exported JSON file.
                   </p>
                   {fileName && (
-                    <motion.p 
-                      className="text-xs font-mono mb-2 text-green-600"
+                    <motion.p
+                      className="text-xs font-medium mb-2 text-green-700 bg-green-100/50 px-2 py-1 rounded"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                     >
@@ -148,8 +143,8 @@ export default function ImportExportModal({
                     </motion.p>
                   )}
                   {error && (
-                    <motion.p 
-                      className="text-xs font-mono mb-2 text-red-600"
+                    <motion.p
+                      className="text-xs font-medium mb-2 text-red-700 bg-red-100/50 px-2 py-1 rounded"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                     >
@@ -157,12 +152,16 @@ export default function ImportExportModal({
                     </motion.p>
                   )}
                   <label
-                    className={`bg-white text-black font-bold uppercase px-6 py-3 border-2 border-black hover:bg-black hover:text-white transition-colors text-sm cursor-pointer flex items-center justify-center w-full ${
+                    className={`w-full bg-white/80 text-gray-800 font-semibold px-4 py-2.5 rounded-lg border border-gray-300/50 hover:bg-white hover:shadow-lg transition-all text-sm cursor-pointer flex items-center justify-center ${
                       isImporting ? 'opacity-50 cursor-not-allowed' : ''
                     }`}
                   >
-                    <FileUp className="mr-2" size={16} />
-                    {isImporting ? 'IMPORTING...' : 'SELECT FILE TO IMPORT'}
+                    {isImporting ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <FileUp className="mr-2" size={16} />
+                    )}
+                    {isImporting ? 'Importing...' : 'Select File to Import'}
                     <input
                       type="file"
                       accept=".json"
@@ -172,23 +171,6 @@ export default function ImportExportModal({
                     />
                   </label>
                 </div>
-              </motion.div>
-
-              <motion.div 
-                className="pt-4 md:pt-2"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.2, delay: 0.3, ease: "linear" }}
-              >
-                <motion.button
-                  type="button"
-                  onClick={handleClose}
-                  className="bg-white text-black font-bold uppercase py-3 px-6 border-2 border-black hover:bg-black hover:text-white transition-colors text-sm md:text-base w-full"
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.1, ease: "linear" }}
-                >
-                  CLOSE
-                </motion.button>
               </motion.div>
             </div>
           </motion.div>
